@@ -3,10 +3,10 @@ import { HighlightPhoto } from '@/types';
 export const highlightPhotos: HighlightPhoto[] = [
   {
     id: 'highlight-1',
-    title: 'Matterhorn at Golden Hour',
-    location: 'Zermatt, Switzerland',
+    title: 'Norway at Golden Hour',
+    location: 'Gaustadblikk, Norway',
     imageUrl: '/images/highlights/highlight-1.svg',
-    imageAlt: 'Matterhorn mountain bathed in golden sunrise light',
+    imageAlt: 'Norwegian mountain bathed in golden sunrise light',
     date: '2024-07-16',
     story: 'Captured during our early morning hike, this moment reminded us why we travel.',
   },

@@ -3,9 +3,9 @@ import { TravelStory } from '@/types';
 export const travelStories: TravelStory[] = [
   {
     id: 'story-1',
-    title: 'Summer Adventure in the Swiss Alps',
+    title: 'Summer Adventure in the Norwegian Alps',
     destination: 'Zermatt',
-    country: 'Switzerland',
+    country: 'Norway',
     date: '2024-07-15',
     description: 'An unforgettable family hiking experience with stunning mountain views and memorable encounters with local wildlife.',
     highlights: [
