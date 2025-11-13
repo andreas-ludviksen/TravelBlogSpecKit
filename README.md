@@ -1,5 +1,8 @@
 # firstSpecKitProject
 
+[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://andreas-ludviksen.github.io/firstSpecKitProject/)
+[![Deploy Documentation](https://github.com/andreas-ludviksen/firstSpecKitProject/actions/workflows/docs.yml/badge.svg)](https://github.com/andreas-ludviksen/firstSpecKitProject/actions/workflows/docs.yml)
+
 A demonstration of **Spec-Driven Development** using GitHub's Spec Kit framework. This repository showcases how structured specifications can drive the entire development lifecycle—from initial requirements to working implementation.
 
 ## 📚 Documentation
