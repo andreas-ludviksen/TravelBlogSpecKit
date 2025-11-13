@@ -493,6 +493,7 @@ Free services:
 
 Add Google Analytics or similar:
 
+{% raw %}
 ```typescript
 // src/app/layout.tsx
 export default function RootLayout({ children }) {
@@ -513,6 +514,8 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
+```
+{% endraw %}
 ```
 
 ## Rollback Strategy
