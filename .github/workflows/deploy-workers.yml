@@ -31,7 +31,7 @@ jobs:
         working-directory: ./travel-blog
 
       - name: Run tests (Workers only)
-        run: npm test -- --selectProjects=workers
+        run: npm run test:workers
         working-directory: ./travel-blog
 
       - name: Deploy to Cloudflare Workers

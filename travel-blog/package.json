@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest",
+    "test": "npm run test:client && npm run test:workers",
+    "test:client": "jest",
+    "test:workers": "jest --config=jest.config.workers.js",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "generate-hash": "node workers/scripts/generate-hash.js"

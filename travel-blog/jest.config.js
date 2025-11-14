@@ -5,7 +5,7 @@ const createJestConfig = nextJest({
   dir: './', // Next.js app directory
 });
 
-// Custom Jest configuration
+// Custom Jest configuration for Next.js client tests
 const customJestConfig = {
   // Test environment (jsdom for React components)
   testEnvironment: 'jsdom',
@@ -18,38 +18,9 @@ const customJestConfig = {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
 
-  // Test file patterns
+  // Test only client code (src/**)
   testMatch: [
-    '**/__tests__/**/*.test.[jt]s?(x)',
-    '**/?(*.)+(spec|test).[jt]s?(x)',
-  ],
-
-  // Separate test environments
-  projects: [
-    {
-      displayName: 'client',
-      testEnvironment: 'jsdom',
-      testMatch: ['<rootDir>/src/**/*.test.[jt]s?(x)'],
-      setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
-      // Don't specify transform - let Next.js handle it
-    },
-    {
-      displayName: 'workers',
-      testEnvironment: 'node',
-      testMatch: ['<rootDir>/tests/workers/**/*.test.[jt]s'],
-      preset: 'ts-jest',
-      transform: {
-        '^.+\\.tsx?$': ['ts-jest', {
-          tsconfig: {
-            module: 'commonjs',
-            esModuleInterop: true,
-          },
-        }],
-      },
-      moduleNameMapper: {
-        '^@workers/(.*)$': '<rootDir>/workers/$1',
-      },
-    },
+    '<rootDir>/src/**/*.test.[jt]s?(x)',
   ],
 
   // Coverage configuration
@@ -65,7 +36,7 @@ const customJestConfig = {
   coverageReporters: ['html', 'text', 'lcov', 'json-summary'],
 
   // Ignore patterns
-  testPathIgnorePatterns: ['/node_modules/', '/.next/'],
+  testPathIgnorePatterns: ['/node_modules/', '/.next/', '/tests/'],
 
   // Maximum workers for parallel execution
   maxWorkers: '50%',
