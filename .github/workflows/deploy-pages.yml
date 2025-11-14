@@ -32,6 +32,8 @@ jobs:
       - name: Build Next.js site
         run: npm run build
         working-directory: ./travel-blog
+        env:
+          NEXT_PUBLIC_AUTH_API_URL: https://travel-blog-auth.andreas-e-ludviksen.workers.dev
       
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
