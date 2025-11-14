@@ -98,7 +98,8 @@ travel-blog/
 │   └── workers/          # Workers unit tests (42 tests, 57.83% coverage)
 ├── docs/                 # Documentation
 │   ├── README.md         # Documentation overview
-│   └── cloudflare-setup.md    # Deployment guide
+│   ├── cloudflare-setup.md    # Deployment guide
+│   └── user-management.md     # Adding/managing users
 ├── public/
 │   └── images/           # Static images
 │       ├── highlights/   # 5 highlight photos
