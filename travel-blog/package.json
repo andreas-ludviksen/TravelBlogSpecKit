@@ -9,7 +9,8 @@
     "lint": "next lint",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "generate-hash": "node workers/scripts/generate-hash.js"
   },
   "dependencies": {
     "next": "14.2.33",

@@ -1,11 +1,11 @@
 /**
  * Script to generate bcrypt password hashes for user credentials
- * Usage: npx ts-node scripts/generate-hash.ts [password]
+ * Usage: node workers/scripts/generate-hash.js [password]
  * If no password provided, will prompt for input
  */
 
-import bcrypt from 'bcryptjs';
-import * as readline from 'readline';
+const bcrypt = require('bcryptjs');
+const readline = require('readline');
 
 const COST_FACTOR = 10;
 
@@ -31,7 +31,7 @@ async function main() {
   console.log('⚠️  Never commit plaintext passwords or hashes to git!\n');
 }
 
-function promptPassword(): Promise<string> {
+function promptPassword() {
   return new Promise((resolve) => {
     const rl = readline.createInterface({
       input: process.stdin,

@@ -8,12 +8,31 @@ How to add, update, and remove users in the Cloudflare D1 database.
 
 ### Step 1: Generate Password Hash
 
+**Bash/Linux/macOS:**
 ```bash
 cd travel-blog
-node workers/scripts/generate-hash.js
+npm run generate-hash
+```
+
+**PowerShell (with Execution Policy restrictions):**
+```powershell
+cd travel-blog
+node -e "require('child_process').execSync('npm run generate-hash', {stdio: 'inherit'})"
 ```
 
 When prompted, enter the password for the new user (e.g., `securepassword123`).
+
+Or provide password as argument (less secure - visible in terminal history):
+
+**Bash:**
+```bash
+npm run generate-hash mypassword123
+```
+
+**PowerShell:**
+```powershell
+node -e "require('child_process').execSync('npm run generate-hash mypassword123', {stdio: 'inherit'})"
+```
 
 **Example output:**
 ```
@@ -30,14 +49,31 @@ Copy this hash to use in SQL INSERT statement
 
 ### Step 2: Insert User into Database
 
+**Bash/Linux/macOS:**
 ```bash
 # Replace values:
 # - henrik = username
-# - $2b$10$... = hash from Step 1 (escape $ with \$ in PowerShell)
+# - $2b$10$... = hash from Step 1
 # - contributor = role (either 'reader' or 'contributor')
 # - Henrik = display name
 
-npx wrangler d1 execute travel-blog-users --remote --command="INSERT INTO users (username, password_hash, role, display_name) VALUES ('henrik', '\$2b\$10\$3uY2msEgvhygThAlzDzMBetHrD7GSffYj.W8WZ3I9VVlTmepwdPoi', 'contributor', 'Henrik')"
+wrangler d1 execute travel-blog-users --remote --command="INSERT INTO users (username, password_hash, role, display_name) VALUES ('henrik', '\$2b\$10\$3uY2msEgvhygThAlzDzMBetHrD7GSffYj.W8WZ3I9VVlTmepwdPoi', 'reader', 'Henrik')"
+```
+
+**PowerShell:**
+```powershell
+# 1. Generate hash
+npm run generate-hash
+
+# 2. Create temporary SQL file (replace HASH_HERE with output from step 1)
+# Note: PowerShell treats $ as variable, so use single quotes to prevent expansion
+'INSERT INTO users (username, password_hash, role, display_name) VALUES (''henrik'', ''$2b$10$HASH_HERE'', ''reader'', ''Henrik'');' | Set-Content -Path temp-insert.sql -NoNewline
+
+# 3. Execute
+node -e "require('child_process').execSync('npx wrangler d1 execute travel-blog-users --remote --file=temp-insert.sql', {stdio: 'inherit'})"
+
+# 4. Cleanup
+Remove-Item temp-insert.sql
 ```
 
 **Expected output:**
@@ -47,8 +83,18 @@ npx wrangler d1 execute travel-blog-users --remote --command="INSERT INTO users 
 
 ### Step 3: Verify User Was Added
 
+**Bash:**
 ```bash
-npx wrangler d1 execute travel-blog-users --remote --command="SELECT username, role, display_name FROM users WHERE username='henrik'"
+wrangler d1 execute travel-blog-users --remote --command="SELECT username, role, display_name FROM users WHERE username='henrik'"
+```
+
+**PowerShell:**
+```powershell
+'SELECT username, role, display_name FROM users WHERE username=''henrik'';' | Set-Content -Path temp-verify.sql -NoNewline
+
+node -e "require('child_process').execSync('npx wrangler d1 execute travel-blog-users --remote --file=temp-verify.sql', {stdio: 'inherit'})"
+
+Remove-Item temp-verify.sql
 ```
 
 **Expected output:**
@@ -73,32 +119,94 @@ npx wrangler d1 execute travel-blog-users --remote --command="SELECT username, r
 
 ### Change User Role
 
+**Bash:**
 ```bash
-npx wrangler d1 execute travel-blog-users --remote --command="UPDATE users SET role='contributor' WHERE username='henrik'"
+wrangler d1 execute travel-blog-users --remote --command="UPDATE users SET role='contributor' WHERE username='henrik'"
+```
+
+**PowerShell:**
+```powershell
+'UPDATE users SET role=''contributor'' WHERE username=''henrik'';' | Set-Content -Path temp-update.sql -NoNewline
+
+node -e "require('child_process').execSync('npx wrangler d1 execute travel-blog-users --remote --file=temp-update.sql', {stdio: 'inherit'})"
+
+Remove-Item temp-update.sql
 ```
 
 ### Change Display Name
 
+**Bash:**
 ```bash
-npx wrangler d1 execute travel-blog-users --remote --command="UPDATE users SET display_name='Henrik Nielsen' WHERE username='henrik'"
+wrangler d1 execute travel-blog-users --remote --command="UPDATE users SET display_name='Henrik Nielsen' WHERE username='henrik'"
+```
+
+**PowerShell:**
+```powershell
+'UPDATE users SET display_name=''Henrik Nielsen'' WHERE username=''henrik'';' | Set-Content -Path temp-update.sql -NoNewline
+
+node -e "require('child_process').execSync('npx wrangler d1 execute travel-blog-users --remote --file=temp-update.sql', {stdio: 'inherit'})"
+
+Remove-Item temp-update.sql
 ```
 
 ### Reset Password
 
+**Bash:**
 ```bash
 # 1. Generate new hash
-node workers/scripts/generate-hash.js
+npm run generate-hash
 
 # 2. Update password_hash
-npx wrangler d1 execute travel-blog-users --remote --command="UPDATE users SET password_hash='\$2b\$10\$NEW_HASH_HERE' WHERE username='henrik'"
+wrangler d1 execute travel-blog-users --remote --command="UPDATE users SET password_hash='\$2b\$10\$NEW_HASH_HERE' WHERE username='henrik'"
+```
+
+**PowerShell:**
+```powershell
+# 1. Generate new hash
+node -e "require('child_process').execSync('npm run generate-hash', {stdio: 'inherit'})"
+
+# 2. Create SQL file with new hash (replace with your actual hash)
+@"
+**PowerShell:**
+```powershell
+# 1. Generate new hash
+npm run generate-hash
+
+# 2. Create temp SQL file (replace HASH_HERE with output from step 1)
+# Note: Use single quotes to prevent $ expansion
+'UPDATE users SET password_hash=''$2b$10$HASH_HERE'' WHERE username=''henrik'';' | Set-Content -Path temp-update.sql -NoNewline
+
+# 3. Execute
+node -e "require('child_process').execSync('npx wrangler d1 execute travel-blog-users --remote --file=temp-update.sql', {stdio: 'inherit'})"
+
+# 4. Cleanup
+Remove-Item temp-update.sql
+```
+"@ | Out-File -FilePath temp-update.sql -Encoding utf8
+
+# 3. Execute
+node -e "require('child_process').execSync('npx wrangler d1 execute travel-blog-users --remote --file=temp-update.sql', {stdio: 'inherit'})"
+
+# 4. Cleanup
+Remove-Item temp-update.sql
 ```
 
 ---
 
 ## Removing a User
 
+**Bash:**
 ```bash
-npx wrangler d1 execute travel-blog-users --remote --command="DELETE FROM users WHERE username='henrik'"
+wrangler d1 execute travel-blog-users --remote --command="DELETE FROM users WHERE username='henrik'"
+```
+
+**PowerShell:**
+```powershell
+'DELETE FROM users WHERE username=''henrik'';' | Set-Content -Path temp-delete.sql -NoNewline
+
+node -e "require('child_process').execSync('npx wrangler d1 execute travel-blog-users --remote --file=temp-delete.sql', {stdio: 'inherit'})"
+
+Remove-Item temp-delete.sql
 ```
 
 **⚠️ Warning**: This is permanent. Consider deactivating instead (future feature: `active` column).
@@ -107,9 +215,20 @@ npx wrangler d1 execute travel-blog-users --remote --command="DELETE FROM users 
 
 ## Listing All Users
 
+**Bash:**
 ```bash
 # List all users (without password hashes)
-npx wrangler d1 execute travel-blog-users --remote --command="SELECT username, role, display_name, created_at FROM users ORDER BY created_at DESC"
+wrangler d1 execute travel-blog-users --remote --command="SELECT username, role, display_name, created_at FROM users ORDER BY created_at DESC"
+```
+
+**PowerShell:**
+```powershell
+# List all users (without password hashes)
+'SELECT username, role, display_name, created_at FROM users ORDER BY created_at DESC;' | Set-Content -Path temp-list.sql -NoNewline
+
+node -e "require('child_process').execSync('npx wrangler d1 execute travel-blog-users --remote --file=temp-list.sql', {stdio: 'inherit'})"
+
+Remove-Item temp-list.sql
 ```
 
 **Example output:**
@@ -129,7 +248,7 @@ npx wrangler d1 execute travel-blog-users --remote --command="SELECT username, r
 
 ### ✅ DO:
 
-- Generate password hashes using `generate-hash.js` script
+- Generate password hashes using `npm run generate-hash`
 - Use strong passwords (8+ characters, mix of letters, numbers, symbols)
 - Execute SQL commands directly via `wrangler d1 execute`
 - Keep terminal history private (clear after adding users)
@@ -156,7 +275,7 @@ Role must be either `'reader'` or `'contributor'` (case-sensitive).
 ### Error: "Escape character '$' is not recognized"
 
 In PowerShell, escape `$` symbols in the hash with `\$`:
-```bash
+```powershell
 # Wrong:
 '$2b$10$abc...'
 
@@ -164,11 +283,39 @@ In PowerShell, escape `$` symbols in the hash with `\$`:
 '\$2b\$10\$abc...'
 ```
 
+When using the node wrapper, quotes are already escaped properly in the examples above.
+
+### PowerShell Execution Policy Error
+
+If you get "running scripts is disabled on this system":
+
+**Solution 1 - Use node wrapper (recommended):**
+```powershell
+node -e "require('child_process').execSync('npm run generate-hash', {stdio: 'inherit'})"
+```
+
+**Solution 2 - Bypass execution policy for single command:**
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass "npm run generate-hash"
+```
+
+**Solution 3 - Change execution policy (admin required):**
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
 ### Database is Empty
 
 Run the seed migration:
+
+**Bash:**
 ```bash
-npx wrangler d1 execute travel-blog-users --remote --file=workers/migrations/0002_seed_test_users.sql
+wrangler d1 execute travel-blog-users --remote --file=workers/migrations/0002_seed_test_users.sql
+```
+
+**PowerShell:**
+```powershell
+node -e "require('child_process').execSync('npx wrangler d1 execute travel-blog-users --remote --file=workers/migrations/0002_seed_test_users.sql', {stdio: 'inherit'})"
 ```
 
 ---
