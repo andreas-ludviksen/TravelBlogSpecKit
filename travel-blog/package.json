@@ -13,6 +13,8 @@
     "generate-hash": "node workers/scripts/generate-hash.js"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "itty-router": "^5.0.22",
     "next": "14.2.33",
     "react": "^18",
     "react-dom": "^18"
