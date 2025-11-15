@@ -27,14 +27,14 @@ Project structure extends existing `travel-blog/` directory:
 
 **Purpose**: Project initialization and database setup
 
-- [ ] T001 Create database migration for blog post schema in travel-blog/migrations/004-blog-posts.sql
-- [ ] T002 Run migration to create tables: blog_posts, design_templates, photo_content, video_content, text_content, post_template_history
-- [ ] T003 [P] Install Cloudflare Workers dependencies: @cloudflare/workers-types, wrangler in travel-blog/workers/package.json
-- [ ] T004 [P] Configure Cloudflare Images API credentials in travel-blog/workers/.dev.vars
-- [ ] T005 [P] Configure Cloudflare R2 bucket for video storage in travel-blog/wrangler.toml
-- [ ] T006 [P] Create TypeScript types for blog post entities in travel-blog/src/types/blog-post.ts
-- [ ] T007 [P] Create TypeScript types for design templates in travel-blog/src/types/design-template.ts
-- [ ] T008 [P] Create TypeScript types for media content in travel-blog/src/types/media-content.ts
+- [X] T001 Create database migration for blog post schema in travel-blog/migrations/004-blog-posts.sql
+- [X] T002 Run migration to create tables: blog_posts, design_templates, photo_content, video_content, text_content, post_template_history
+- [X] T003 [P] Install Cloudflare Workers dependencies: @cloudflare/workers-types, wrangler in travel-blog/workers/package.json
+- [X] T004 [P] Configure Cloudflare Images API credentials in travel-blog/workers/.dev.vars
+- [X] T005 [P] Configure Cloudflare R2 bucket for video storage in travel-blog/wrangler.toml
+- [X] T006 [P] Create TypeScript types for blog post entities in travel-blog/src/types/blog-post.ts
+- [X] T007 [P] Create TypeScript types for design-templates in travel-blog/src/types/design-template.ts
+- [X] T008 [P] Create TypeScript types for media content in travel-blog/src/types/media-content.ts
 
 ---
 
@@ -44,15 +44,15 @@ Project structure extends existing `travel-blog/` directory:
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T009 Implement D1 database client wrapper in travel-blog/workers/lib/db.ts
-- [ ] T010 [P] Implement Cloudflare Images upload helper in travel-blog/workers/lib/cloudflare-images.ts
-- [ ] T011 [P] Implement Cloudflare R2 upload helper in travel-blog/workers/lib/cloudflare-r2.ts
-- [ ] T012 [P] Create slug generation utility in travel-blog/src/utils/slug.ts
-- [ ] T013 [P] Create UUID generation utility in travel-blog/src/utils/uuid.ts
-- [ ] T014 Implement authentication middleware for Workers in travel-blog/workers/lib/auth-middleware.ts
-- [ ] T015 [P] Create base error handling utilities in travel-blog/workers/lib/errors.ts
-- [ ] T016 [P] Seed design templates data (10 templates) in travel-blog/migrations/004-seed-templates.sql
-- [ ] T017 Create placeholder image component in travel-blog/src/components/blog/PlaceholderImage.tsx
+- [X] T009 Implement D1 database client wrapper in travel-blog/workers/lib/db.ts
+- [X] T010 [P] Implement Cloudflare Images upload helper in travel-blog/workers/lib/cloudflare-images.ts
+- [X] T011 [P] Implement Cloudflare R2 upload helper in travel-blog/workers/lib/cloudflare-r2.ts
+- [X] T012 [P] Create slug generation utility in travel-blog/src/utils/slug.ts
+- [X] T013 [P] Create UUID generation utility in travel-blog/src/utils/uuid.ts
+- [X] T014 Implement authentication middleware for Workers in travel-blog/workers/lib/auth-middleware.ts
+- [X] T015 [P] Create base error handling utilities in travel-blog/workers/lib/errors.ts
+- [X] T016 [P] Seed design templates data (10 templates) in travel-blog/migrations/004-seed-templates.sql
+- [X] T017 Create placeholder image component in travel-blog/src/components/blog/PlaceholderImage.tsx
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -75,45 +75,45 @@ Project structure extends existing `travel-blog/` directory:
 
 #### Workers API - Post Creation (US1)
 
-- [ ] T022 [P] [US1] Implement POST /api/posts/create endpoint in travel-blog/workers/posts/create.ts
-- [ ] T023 [P] [US1] Implement GET /api/posts/{postId} endpoint in travel-blog/workers/posts/get.ts
-- [ ] T024 [P] [US1] Implement GET /api/posts list endpoint in travel-blog/workers/posts/list.ts
-- [ ] T025 [P] [US1] Implement DELETE /api/posts/{postId} endpoint in travel-blog/workers/posts/delete.ts
-- [ ] T026 [US1] Create posts router in travel-blog/workers/posts/index.ts (depends on T022-T025)
+- [X] T022 [P] [US1] Implement POST /api/posts/create endpoint in travel-blog/workers/posts/create.ts
+- [X] T023 [P] [US1] Implement GET /api/posts/{postId} endpoint in travel-blog/workers/posts/get.ts
+- [X] T024 [P] [US1] Implement GET /api/posts list endpoint in travel-blog/workers/posts/list.ts
+- [X] T025 [P] [US1] Implement DELETE /api/posts/{postId} endpoint in travel-blog/workers/posts/delete.ts
+- [X] T026 [US1] Create posts router in travel-blog/workers/posts/index.ts (depends on T022-T025)
 
 #### Workers API - Post Content Updates (US1)
 
-- [ ] T027 [P] [US1] Implement PATCH /api/posts/{postId} metadata update in travel-blog/workers/posts/update-metadata.ts
-- [ ] T028 [P] [US1] Implement PUT /api/posts/{postId}/photos/{photoId} in travel-blog/workers/posts/update-photo.ts
-- [ ] T029 [P] [US1] Implement DELETE /api/posts/{postId}/photos/{photoId} in travel-blog/workers/posts/delete-photo.ts
-- [ ] T030 [P] [US1] Implement PUT /api/posts/{postId}/videos/{videoId} in travel-blog/workers/posts/update-video.ts
-- [ ] T031 [P] [US1] Implement DELETE /api/posts/{postId}/videos/{videoId} in travel-blog/workers/posts/delete-video.ts
-- [ ] T032 [P] [US1] Implement PUT /api/posts/{postId}/text/{textId} in travel-blog/workers/posts/update-text.ts
-- [ ] T033 [P] [US1] Implement DELETE /api/posts/{postId}/text/{textId} in travel-blog/workers/posts/delete-text.ts
-- [ ] T034 [P] [US1] Implement POST /api/posts/{postId}/reorder endpoint in travel-blog/workers/posts/reorder.ts
-- [ ] T035 [US1] Create content update router in travel-blog/workers/posts/update.ts (depends on T027-T034)
+- [X] T027 [P] [US1] Implement PATCH /api/posts/{postId} metadata update in travel-blog/workers/posts/update-metadata.ts
+- [X] T028 [P] [US1] Implement PUT /api/posts/{postId}/photos/{photoId} in travel-blog/workers/posts/update-photo.ts
+- [X] T029 [P] [US1] Implement DELETE /api/posts/{postId}/photos/{photoId} in travel-blog/workers/posts/delete-photo.ts
+- [X] T030 [P] [US1] Implement PUT /api/posts/{postId}/videos/{videoId} in travel-blog/workers/posts/update-video.ts
+- [X] T031 [P] [US1] Implement DELETE /api/posts/{postId}/videos/{videoId} in travel-blog/workers/posts/delete-video.ts
+- [X] T032 [P] [US1] Implement PUT /api/posts/{postId}/text/{textId} in travel-blog/workers/posts/update-text.ts
+- [X] T033 [P] [US1] Implement DELETE /api/posts/{postId}/text/{textId} in travel-blog/workers/posts/delete-text.ts
+- [X] T034 [P] [US1] Implement POST /api/posts/{postId}/reorder endpoint in travel-blog/workers/posts/reorder.ts
+- [X] T035 [US1] Create content update router in travel-blog/workers/posts/update.ts (depends on T027-T034)
 
 #### Frontend - Post Editor UI (US1)
 
-- [ ] T036 [P] [US1] Create MediaUploader component with drag-drop in travel-blog/src/components/blog/MediaUploader.tsx
-- [ ] T037 [P] [US1] Create PhotoList component with reordering in travel-blog/src/components/blog/PhotoList.tsx
-- [ ] T038 [P] [US1] Create VideoList component with reordering in travel-blog/src/components/blog/VideoList.tsx
-- [ ] T039 [P] [US1] Create TextEditor component with Markdown support in travel-blog/src/components/blog/TextEditor.tsx
-- [ ] T040 [US1] Create PostEditor page in travel-blog/src/app/posts/create/page.tsx (depends on T036-T039)
-- [ ] T041 [US1] Implement post creation form logic with API integration in travel-blog/src/app/posts/create/page.tsx
-- [ ] T042 [US1] Add upload progress tracking and error handling in travel-blog/src/components/blog/UploadProgress.tsx
+- [X] T036 [P] [US1] Create MediaUploader component with drag-drop in travel-blog/src/components/blog/MediaUploader.tsx
+- [X] T037 [P] [US1] Create PhotoList component with reordering in travel-blog/src/components/blog/PhotoList.tsx
+- [X] T038 [P] [US1] Create VideoList component with reordering in travel-blog/src/components/blog/VideoList.tsx
+- [X] T039 [P] [US1] Create TextEditor component with Markdown support in travel-blog/src/components/blog/TextEditor.tsx
+- [X] T040 [US1] Create PostEditor page in travel-blog/src/app/posts/create/page.tsx (depends on T036-T039)
+- [X] T041 [US1] Implement post creation form logic with API integration in travel-blog/src/app/posts/create/page.tsx
+- [X] T042 [US1] Add upload progress tracking and error handling in travel-blog/src/components/blog/UploadProgress.tsx
 
 #### Frontend - Template Selection (US1)
 
-- [ ] T043 [P] [US1] Create TemplateSelector component in travel-blog/src/components/blog/TemplateSelector.tsx
-- [ ] T044 [P] [US1] Create TemplateCard component with preview in travel-blog/src/components/blog/TemplateCard.tsx
-- [ ] T045 [US1] Load template metadata from design-templates.ts in travel-blog/src/data/design-templates.ts
+- [X] T043 [P] [US1] Create TemplateSelector component in travel-blog/src/components/blog/TemplateSelector.tsx
+- [X] T044 [P] [US1] Create TemplateCard component with preview in travel-blog/src/components/blog/TemplateCard.tsx
+- [X] T045 [US1] Load template metadata from design-templates.ts in travel-blog/src/data/design-templates.ts
 
 #### Frontend - Post Display (US1)
 
-- [ ] T046 [US1] Create dynamic post page route in travel-blog/src/app/posts/[slug]/page.tsx
-- [ ] T047 [US1] Implement post data fetching with content in travel-blog/src/app/posts/[slug]/page.tsx
-- [ ] T048 [US1] Create PostRenderer component that loads appropriate template in travel-blog/src/components/blog/PostRenderer.tsx
+- [X] T046 [US1] Create dynamic post page route in travel-blog/src/app/posts/[slug]/page.tsx
+- [X] T047 [US1] Implement post data fetching with content in travel-blog/src/app/posts/[slug]/page.tsx
+- [X] T048 [US1] Create PostRenderer component that loads appropriate template in travel-blog/src/components/blog/PostRenderer.tsx
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - contributors can create and publish blog posts with photos, videos, text, and design selection
 
@@ -125,17 +125,17 @@ Project structure extends existing `travel-blog/` directory:
 
 **Template Requirements**: Each template implements FR-016 (placeholders for missing content) and FR-017 (hide excess content)
 
-- [ ] T049 [P] [US1] Create Template01 "Classic Grid" component in travel-blog/src/components/templates/Template01.tsx
-- [ ] T050 [P] [US1] Create Template02 "Story Layout" component in travel-blog/src/components/templates/Template02.tsx
-- [ ] T051 [P] [US1] Create Template03 "Photo Grid Showcase" component in travel-blog/src/components/templates/Template03.tsx
-- [ ] T052 [P] [US1] Create Template04 "Video-First Layout" component in travel-blog/src/components/templates/Template04.tsx
-- [ ] T053 [P] [US1] Create Template05 "Masonry Layout" component in travel-blog/src/components/templates/Template05.tsx
-- [ ] T054 [P] [US1] Create Template06 component in travel-blog/src/components/templates/Template06.tsx
-- [ ] T055 [P] [US1] Create Template07 component in travel-blog/src/components/templates/Template07.tsx
-- [ ] T056 [P] [US1] Create Template08 component in travel-blog/src/components/templates/Template08.tsx
-- [ ] T057 [P] [US1] Create Template09 component in travel-blog/src/components/templates/Template09.tsx
-- [ ] T058 [P] [US1] Create Template10 component in travel-blog/src/components/templates/Template10.tsx
-- [ ] T059 [US1] Create template registry mapping IDs to components in travel-blog/src/components/templates/index.ts
+- [X] T049 [P] [US1] Create Template01 "Classic Grid" component in travel-blog/src/components/templates/Template01.tsx
+- [X] T050 [P] [US1] Create Template02 "Story Layout" component in travel-blog/src/components/templates/Template02.tsx
+- [X] T051 [P] [US1] Create Template03 "Photo Grid Showcase" component in travel-blog/src/components/templates/Template03.tsx
+- [X] T052 [P] [US1] Create Template04 "Video-First Layout" component in travel-blog/src/components/templates/Template04.tsx
+- [X] T053 [P] [US1] Create Template05 "Masonry Layout" component in travel-blog/src/components/templates/Template05.tsx
+- [X] T054 [P] [US1] Create Template06 "Minimal Clean" component in travel-blog/src/components/templates/Template06.tsx
+- [X] T055 [P] [US1] Create Template07 "Magazine Style" component in travel-blog/src/components/templates/Template07.tsx
+- [X] T056 [P] [US1] Create Template08 "Timeline Journey" component in travel-blog/src/components/templates/Template08.tsx
+- [X] T057 [P] [US1] Create Template09 "Split Screen" component in travel-blog/src/components/templates/Template09.tsx
+- [X] T058 [P] [US1] Create Template10 "Collage Mix" component in travel-blog/src/components/templates/Template10.tsx
+- [X] T059 [US1] Create template registry mapping IDs to components in travel-blog/src/components/templates/index.ts
 
 **Checkpoint**: All 10 templates implemented, User Story 1 MVP complete and deployable
 
