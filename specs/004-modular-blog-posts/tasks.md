@@ -62,16 +62,18 @@ Project structure extends existing `travel-blog/` directory:
 
 **Goal**: Contributors can log in, upload photos/videos, write text, select a design template, and publish a complete blog post
 
+**Status**: ✅ DEPLOYED TO PRODUCTION (main branch via GitHub Actions)
+
 **Independent Test**: Log in as contributor, upload test photos (placeholders) and videos (test URLs), enter text content (production Markdown), select design template, publish post, verify post displays correctly at public URL with all content elements
 
 ### Implementation for User Story 1
 
 #### Workers API - Media Upload (US1)
 
-- [ ] T018 [P] [US1] Implement POST /api/media/upload-photo endpoint in travel-blog/workers/media-upload/upload-photo.ts
-- [ ] T019 [P] [US1] Implement POST /api/media/upload-video endpoint in travel-blog/workers/media-upload/upload-video.ts
+- [X] T018 [P] [US1] Implement POST /api/media/upload-photo endpoint in travel-blog/workers/media-upload/upload-photo.ts
+- [X] T019 [P] [US1] Implement POST /api/media/upload-video endpoint in travel-blog/workers/media-upload/upload-video.ts
 - [ ] T020 [P] [US1] Implement POST /api/media/validate-url endpoint in travel-blog/workers/media-upload/validate-media.ts
-- [ ] T021 [US1] Create media upload router in travel-blog/workers/media-upload/index.ts (depends on T018, T019, T020)
+- [X] T021 [US1] Create media upload router in travel-blog/workers/media-upload/index.ts (depends on T018, T019, T020)
 
 #### Workers API - Post Creation (US1)
 
