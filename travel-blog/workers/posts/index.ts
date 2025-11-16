@@ -40,37 +40,44 @@ interface Env {
   JWT_SECRET: string;
 }
 
-const router = Router({ base: '/api/posts' });
+const router = Router();
+
+// Health check endpoint
+router.get('/api/posts/health', () => {
+  return new Response(JSON.stringify({ status: 'ok', service: 'posts' }), {
+    headers: { 'Content-Type': 'application/json' }
+  });
+});
 
 // Create new blog post
-router.post('/create', createPost);
+router.post('/api/posts/create', createPost);
 
 // List blog posts
-router.get('/', listPosts);
+router.get('/api/posts', listPosts);
 
 // Get single blog post
-router.get('/:postId', getPost);
+router.get('/api/posts/:postId', getPost);
 
 // Update post metadata
-router.patch('/:postId', updateMetadata);
+router.patch('/api/posts/:postId', updateMetadata);
 
 // Delete blog post
-router.delete('/:postId', deletePost);
+router.delete('/api/posts/:postId', deletePost);
 
 // Reorder content
-router.post('/:postId/reorder', reorderContent);
+router.post('/api/posts/:postId/reorder', reorderContent);
 
 // Photo content management
-router.put('/:postId/photos/:photoId', updatePhoto);
-router.delete('/:postId/photos/:photoId', deletePhoto);
+router.put('/api/posts/:postId/photos/:photoId', updatePhoto);
+router.delete('/api/posts/:postId/photos/:photoId', deletePhoto);
 
 // Video content management
-router.put('/:postId/videos/:videoId', updateVideo);
-router.delete('/:postId/videos/:videoId', deleteVideo);
+router.put('/api/posts/:postId/videos/:videoId', updateVideo);
+router.delete('/api/posts/:postId/videos/:videoId', deleteVideo);
 
 // Text content management
-router.put('/:postId/text/:textId', updateText);
-router.delete('/:postId/text/:textId', deleteText);
+router.put('/api/posts/:postId/text/:textId', updateText);
+router.delete('/api/posts/:postId/text/:textId', deleteText);
 
 // 404 handler
 router.all('*', () => errorResponse('Not Found', 'The requested resource was not found', 404));
@@ -78,8 +85,10 @@ router.all('*', () => errorResponse('Not Found', 'The requested resource was not
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     try {
-      return await router.handle(request, env, ctx);
+      const response = await router.fetch(request, env, ctx);
+      return response || new Response('Not Found', { status: 404 });
     } catch (error) {
+      console.error('Posts worker error:', error);
       return handleError(error);
     }
   },

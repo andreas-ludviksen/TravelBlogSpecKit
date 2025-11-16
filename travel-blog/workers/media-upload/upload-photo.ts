@@ -81,8 +81,12 @@ export const uploadPhoto = withAuth(async (request: Request, user, env: Env) => 
       uploadedBy: user.sub,
     });
 
+    console.log('[UPLOAD PHOTO] Upload result:', uploadResult);
+
     // Get variant URLs
     const variants = imagesClient.getVariantUrls(uploadResult.id);
+    
+    console.log('[UPLOAD PHOTO] Variant URLs:', variants);
 
     // Extract image dimensions (if available from upload result)
     const width = (uploadResult as any).width || null;

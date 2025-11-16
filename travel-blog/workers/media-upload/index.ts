@@ -22,16 +22,23 @@ interface Env {
   JWT_SECRET: string;
 }
 
-const router = Router({ base: '/api/media' });
+const router = Router();
+
+// Health check endpoint
+router.get('/api/media/health', () => {
+  return new Response(JSON.stringify({ status: 'ok', service: 'media-upload' }), {
+    headers: { 'Content-Type': 'application/json' }
+  });
+});
 
 // Upload photo to Cloudflare Images
-router.post('/upload-photo', uploadPhoto);
+router.post('/api/media/upload-photo', uploadPhoto);
 
 // Upload video to Cloudflare R2
-router.post('/upload-video', uploadVideo);
+router.post('/api/media/upload-video', uploadVideo);
 
 // Validate external media URL
-router.post('/validate-url', validateUrl);
+router.post('/api/media/validate-url', validateUrl);
 
 // 404 handler
 router.all('*', () => errorResponse('Not Found', 'The requested resource was not found', 404));
@@ -39,8 +46,10 @@ router.all('*', () => errorResponse('Not Found', 'The requested resource was not
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     try {
-      return await router.handle(request, env, ctx);
+      const response = await router.fetch(request, env, ctx);
+      return response || new Response('Not Found', { status: 404 });
     } catch (error) {
+      console.error('Media worker error:', error);
       return handleError(error);
     }
   },

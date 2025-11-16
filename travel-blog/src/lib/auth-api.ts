@@ -47,21 +47,10 @@ export interface LogoutResponse {
 
 /**
  * Get the base URL for auth API endpoints
- * In production, this will be the Cloudflare Workers URL
- * In development, use the Workers dev server or a proxy
+ * Always use Next.js API routes as a proxy to avoid CORS and cookie issues
  */
 function getAuthApiUrl(): string {
-  // In production, use environment variable
-  if (process.env.NEXT_PUBLIC_AUTH_API_URL) {
-    return process.env.NEXT_PUBLIC_AUTH_API_URL;
-  }
-  
-  // In development, use localhost Workers dev server
-  if (process.env.NODE_ENV === 'development') {
-    return 'http://localhost:8787';
-  }
-  
-  // Fallback to same origin (assumes Workers deployed on same domain)
+  // Use Next.js API routes (same origin)
   return '';
 }
 

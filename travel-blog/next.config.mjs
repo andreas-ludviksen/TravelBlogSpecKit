@@ -1,8 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
+  // Temporarily disable static export for local development/testing
+  // Re-enable for production deployment to Cloudflare Pages
+  // output: 'export',
   images: {
-    unoptimized: true, // Required for static export to non-Vercel hosts
+    unoptimized: true,
   },
 };
 

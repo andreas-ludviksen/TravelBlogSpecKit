@@ -32,9 +32,16 @@ interface UpdateMetadataRequest {
   slug?: string;
 }
 
-export const updateMetadata = withAuth(async (request: Request, user, env: Env, params: any) => {
+export const updateMetadata = withAuth(async (request: Request, user, env: Env, ctx: any) => {
   try {
-    const { postId } = params;
+    console.log('[UPDATE METADATA] ctx:', ctx);
+    console.log('[UPDATE METADATA] request:', request);
+    console.log('[UPDATE METADATA] request params:', (request as any).params);
+    
+    // In itty-router v5, params are on the request object
+    const postId = (request as any).params?.postId || ctx?.postId;
+
+    console.log('[UPDATE METADATA] postId:', postId);
 
     if (!postId) {
       throw new NotFoundError('Post not found');
@@ -43,8 +50,7 @@ export const updateMetadata = withAuth(async (request: Request, user, env: Env, 
     const body = await parseJsonBody<UpdateMetadataRequest>(request);
 
     // Validate at least one field is being updated
-    if (!body.title && !body.description && body.coverImage === undefined && 
-        !body.status && !body.slug) {
+    if (!body.title && !body.status && !body.slug) {
       throw new ValidationError('No fields to update');
     }
 
@@ -75,16 +81,6 @@ export const updateMetadata = withAuth(async (request: Request, user, env: Env, 
       }
       updates.push('title = ?');
       updateParams.push(body.title);
-    }
-
-    if (body.description !== undefined) {
-      updates.push('description = ?');
-      updateParams.push(body.description || null);
-    }
-
-    if (body.coverImage !== undefined) {
-      updates.push('cover_image = ?');
-      updateParams.push(body.coverImage || null);
     }
 
     if (body.status !== undefined) {
@@ -130,7 +126,7 @@ export const updateMetadata = withAuth(async (request: Request, user, env: Env, 
     // Fetch updated post
     const updatedPost = await db.queryOne(
       `SELECT 
-        id, slug, title, description, cover_image, template_id,
+        id, slug, title, design_template_id as template_id,
         author_id, status, published_at, created_at, updated_at
       FROM blog_posts
       WHERE id = ?`,
@@ -143,8 +139,6 @@ export const updateMetadata = withAuth(async (request: Request, user, env: Env, 
         id: updatedPost.id,
         slug: updatedPost.slug,
         title: updatedPost.title,
-        description: updatedPost.description,
-        coverImage: updatedPost.cover_image,
         templateId: updatedPost.template_id,
         authorId: updatedPost.author_id,
         status: updatedPost.status,

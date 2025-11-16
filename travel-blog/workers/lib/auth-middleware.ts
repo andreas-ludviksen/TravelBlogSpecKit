@@ -66,6 +66,12 @@ export async function authenticate(
   // Extract token
   const token = extractToken(request);
   
+  console.log('[Auth Middleware] Token extracted:', token ? `${token.substring(0, 20)}...` : 'null');
+  console.log('[Auth Middleware] JWT Secret available:', !!jwtSecret);
+  if (jwtSecret) {
+    console.log('[Auth Middleware] JWT Secret length:', jwtSecret.length);
+  }
+  
   if (!token) {
     if (optional) {
       return { authorized: true }; // Allow unauthenticated access
@@ -82,6 +88,8 @@ export async function authenticate(
 
   // Verify token
   const verification = verifyTokenDetailed(token, jwtSecret);
+  
+  console.log('[Auth Middleware] Token verification result:', verification.valid ? 'valid' : `invalid (${verification.error})`);
   
   if (!verification.valid) {
     const status = verification.error === 'EXPIRED' ? 401 : 401;
@@ -120,8 +128,12 @@ export function withAuth(
   handler: (request: Request, user: SessionPayload, ...args: any[]) => Promise<Response>,
   options: AuthMiddlewareOptions = {}
 ) {
-  return async (request: Request, env: any, ...args: any[]): Promise<Response> => {
+  return async (request: Request, env: any, ctx: any): Promise<Response> => {
     const jwtSecret = env.JWT_SECRET;
+    
+    console.log('[withAuth] JWT_SECRET available:', !!jwtSecret);
+    console.log('[withAuth] JWT_SECRET length:', jwtSecret?.length || 0);
+    console.log('[withAuth] JWT_SECRET first 10 chars:', jwtSecret?.substring(0, 10) || 'N/A');
     
     if (!jwtSecret) {
       return new Response(
@@ -136,8 +148,8 @@ export function withAuth(
       return auth.response!;
     }
 
-    // Call handler with authenticated user
-    return handler(request, auth.user!, env, ...args);
+    // Call handler with authenticated user and pass through env and ctx (which contains route params)
+    return handler(request, auth.user!, env, ctx);
   };
 }
 

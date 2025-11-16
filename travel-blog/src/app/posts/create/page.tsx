@@ -59,13 +59,13 @@ export default function CreatePostPage() {
     try {
       // For now, use hardcoded templates - will fetch from API later
       setTemplates([
-        { id: '1', name: 'Classic Grid', description: '3-column photo grid with text sections' },
-        { id: '2', name: 'Story Layout', description: 'Single column storytelling layout' },
-        { id: '3', name: 'Photo Grid Showcase', description: 'Large photo grid, minimal text' },
-        { id: '4', name: 'Video-First Layout', description: 'Hero video with photo gallery' },
-        { id: '5', name: 'Masonry Layout', description: 'Pinterest-style masonry grid' },
+        { id: 'template-01', name: 'Classic Grid', description: '3-column photo grid with text sections' },
+        { id: 'template-02', name: 'Story Layout', description: 'Single column storytelling layout' },
+        { id: 'template-03', name: 'Photo Grid Showcase', description: 'Large photo grid, minimal text' },
+        { id: 'template-04', name: 'Video-First Layout', description: 'Hero video with photo gallery' },
+        { id: 'template-05', name: 'Masonry Layout', description: 'Pinterest-style masonry grid' },
       ]);
-      setSelectedTemplate('1'); // Default template
+      setSelectedTemplate('template-01'); // Default template
     } catch (err) {
       console.error('Failed to load templates:', err);
     }
@@ -435,7 +435,7 @@ export default function CreatePostPage() {
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
                   placeholder="Enter post title..."
                 />
               </div>
@@ -447,7 +447,7 @@ export default function CreatePostPage() {
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
                   rows={3}
                   placeholder="Brief description of your post..."
                 />

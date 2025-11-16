@@ -42,6 +42,9 @@ export const createPost = withAuth(async (request: Request, user, env: Env) => {
   try {
     const body = await parseJsonBody<CreatePostRequest>(request);
 
+    console.log('[CREATE POST] Request body:', body);
+    console.log('[CREATE POST] User:', user);
+
     // Validate required fields
     if (!body.title || body.title.trim().length === 0) {
       throw new ValidationError('title is required and cannot be empty');
@@ -57,6 +60,9 @@ export const createPost = withAuth(async (request: Request, user, env: Env) => {
       'SELECT id FROM design_templates WHERE id = ?',
       [body.templateId]
     );
+    
+    console.log('[CREATE POST] Template lookup result:', template);
+    
     if (!template) {
       throw new ValidationError('Template not found');
     }
@@ -85,7 +91,7 @@ export const createPost = withAuth(async (request: Request, user, env: Env) => {
 
     await db.execute(
       `INSERT INTO blog_posts (
-        id, slug, title, template_id, author_id, status, created_at, updated_at
+        id, slug, title, design_template_id, author_id, status, created_at, updated_at
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [postId, slug, body.title, body.templateId, user.sub, status, now, now]
     );
