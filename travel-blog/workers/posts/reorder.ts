@@ -28,9 +28,11 @@ interface ReorderRequest {
   contentIds: string[];
 }
 
-export const reorderContent = withAuth(async (request: Request, user, env: Env, params: any) => {
+export const reorderContent = withAuth(async (request: Request & { params?: any }, user, env: Env, params: any) => {
   try {
-    const { postId } = params;
+    // itty-router puts params on the request object
+    const routeParams = (request as any).params || params;
+    const { postId } = routeParams;
 
     if (!postId) {
       throw new NotFoundError('Post not found');

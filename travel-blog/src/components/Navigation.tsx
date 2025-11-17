@@ -40,6 +40,19 @@ export default function Navigation() {
                     </Link>
                   );
                 })}
+              {/* Show Create Blog link for contributors */}
+              {isAuthenticated && user?.role === 'contributor' && (
+                <Link
+                  href="/posts/create"
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    pathname === '/posts/create'
+                      ? 'bg-green-600 text-white'
+                      : 'text-green-700 hover:bg-green-100 hover:text-green-800'
+                  }`}
+                >
+                  Create Blog
+                </Link>
+              )}
             </div>
           </div>
           <div className="flex items-center space-x-4">

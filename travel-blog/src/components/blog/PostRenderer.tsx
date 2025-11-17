@@ -25,6 +25,17 @@ const templates: Record<string, any> = {
   '8': dynamic(() => import('@/components/templates/Template08').catch(() => DefaultTemplate)),
   '9': dynamic(() => import('@/components/templates/Template09').catch(() => DefaultTemplate)),
   '10': dynamic(() => import('@/components/templates/Template10').catch(() => DefaultTemplate)),
+  // Also map full template IDs (template-01, template-02, etc.)
+  'template-01': dynamic(() => import('@/components/templates/Template01').catch(() => DefaultTemplate)),
+  'template-02': dynamic(() => import('@/components/templates/Template02').catch(() => DefaultTemplate)),
+  'template-03': dynamic(() => import('@/components/templates/Template03').catch(() => DefaultTemplate)),
+  'template-04': dynamic(() => import('@/components/templates/Template04').catch(() => DefaultTemplate)),
+  'template-05': dynamic(() => import('@/components/templates/Template05').catch(() => DefaultTemplate)),
+  'template-06': dynamic(() => import('@/components/templates/Template06').catch(() => DefaultTemplate)),
+  'template-07': dynamic(() => import('@/components/templates/Template07').catch(() => DefaultTemplate)),
+  'template-08': dynamic(() => import('@/components/templates/Template08').catch(() => DefaultTemplate)),
+  'template-09': dynamic(() => import('@/components/templates/Template09').catch(() => DefaultTemplate)),
+  'template-10': dynamic(() => import('@/components/templates/Template10').catch(() => DefaultTemplate)),
 };
 
 interface BlogPost {
@@ -50,6 +61,11 @@ interface PostRendererProps {
 
 // Default template fallback
 function DefaultTemplate({ post, content }: PostRendererProps) {
+  // Sort content by displayOrder
+  const sortedPhotos = [...content.photos].sort((a, b) => a.displayOrder - b.displayOrder);
+  const sortedVideos = [...content.videos].sort((a, b) => a.displayOrder - b.displayOrder);
+  const sortedTextBlocks = [...content.textBlocks].sort((a, b) => a.displayOrder - b.displayOrder);
+
   return (
     <article className="max-w-4xl mx-auto px-4 py-12">
       <header className="mb-12">
@@ -84,9 +100,9 @@ function DefaultTemplate({ post, content }: PostRendererProps) {
 
       <div className="space-y-8">
         {/* Photos */}
-        {content.photos.length > 0 && (
+        {sortedPhotos.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {content.photos.map(photo => (
+            {sortedPhotos.map(photo => (
               <div key={photo.id} className="aspect-square rounded-lg overflow-hidden">
                 <img
                   src={photo.url}
@@ -102,9 +118,9 @@ function DefaultTemplate({ post, content }: PostRendererProps) {
         )}
 
         {/* Videos */}
-        {content.videos.length > 0 && (
+        {sortedVideos.length > 0 && (
           <div className="space-y-6">
-            {content.videos.map(video => (
+            {sortedVideos.map(video => (
               <div key={video.id}>
                 <div className="aspect-video rounded-lg overflow-hidden bg-gray-100">
                   <video
@@ -123,9 +139,9 @@ function DefaultTemplate({ post, content }: PostRendererProps) {
         )}
 
         {/* Text Blocks */}
-        {content.textBlocks.length > 0 && (
+        {sortedTextBlocks.length > 0 && (
           <div className="prose prose-lg max-w-none">
-            {content.textBlocks.map(block => (
+            {sortedTextBlocks.map(block => (
               <div 
                 key={block.id}
                 dangerouslySetInnerHTML={{ __html: block.content }}
@@ -139,8 +155,15 @@ function DefaultTemplate({ post, content }: PostRendererProps) {
 }
 
 export default function PostRenderer({ post, content }: PostRendererProps) {
+  // Sort content by displayOrder to ensure correct ordering
+  const sortedContent = {
+    photos: [...content.photos].sort((a, b) => a.displayOrder - b.displayOrder),
+    videos: [...content.videos].sort((a, b) => a.displayOrder - b.displayOrder),
+    textBlocks: [...content.textBlocks].sort((a, b) => a.displayOrder - b.displayOrder),
+  };
+
   // Get the template component
   const TemplateComponent = templates[post.templateId] || DefaultTemplate;
 
-  return <TemplateComponent post={post} content={content} />;
+  return <TemplateComponent post={post} content={sortedContent} />;
 }

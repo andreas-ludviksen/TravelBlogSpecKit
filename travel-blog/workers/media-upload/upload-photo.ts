@@ -22,6 +22,7 @@ import {
 interface Env {
   DB: D1Database;
   CLOUDFLARE_ACCOUNT_ID: string;
+  CLOUDFLARE_IMAGES_ACCOUNT_HASH: string;
   CLOUDFLARE_IMAGES_API_TOKEN: string;
   JWT_SECRET: string;
 }
@@ -73,6 +74,7 @@ export const uploadPhoto = withAuth(async (request: Request, user, env: Env) => 
     // Upload to Cloudflare Images
     const imagesClient = createCloudflareImagesClient({
       accountId: env.CLOUDFLARE_ACCOUNT_ID,
+      accountHash: env.CLOUDFLARE_IMAGES_ACCOUNT_HASH,
       apiToken: env.CLOUDFLARE_IMAGES_API_TOKEN,
     });
 
@@ -83,8 +85,8 @@ export const uploadPhoto = withAuth(async (request: Request, user, env: Env) => 
 
     console.log('[UPLOAD PHOTO] Upload result:', uploadResult);
 
-    // Get variant URLs
-    const variants = imagesClient.getVariantUrls(uploadResult.id);
+    // Get variant URLs from the upload result (contains full URLs)
+    const variants = imagesClient.getVariantUrlsFromResult(uploadResult);
     
     console.log('[UPLOAD PHOTO] Variant URLs:', variants);
 
@@ -105,7 +107,7 @@ export const uploadPhoto = withAuth(async (request: Request, user, env: Env) => 
       [
         photoId,
         postId,
-        variants.desktop,
+        variants.public,  // Use public variant (the only one that exists)
         uploadResult.id,
         caption || null,
         altText,
@@ -121,7 +123,7 @@ export const uploadPhoto = withAuth(async (request: Request, user, env: Env) => 
     // Return response
     return successResponse({
       photoId,
-      url: variants.desktop,
+      url: variants.public,  // Use public variant URL
       cloudflareImageId: uploadResult.id,
       variants,
       width,

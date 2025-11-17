@@ -9,7 +9,7 @@
  * Generate blog post URL from slug
  */
 export function getPostUrl(slug: string): string {
-  return `/blog/${slug}`;
+  return `/blog?slug=${encodeURIComponent(slug)}`;
 }
 
 /**

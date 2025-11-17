@@ -8,13 +8,15 @@
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import PostGrid from '@/components/blog/PostGrid';
 import Pagination from '@/components/blog/Pagination';
 import EmptyPostList from '@/components/blog/EmptyPostList';
-import { fetchPublishedPosts } from '@/lib/posts-api';
+import { fetchPublishedPosts, fetchPostBySlug, PostDetailResponse } from '@/lib/posts-api';
 import type { PaginationInfo } from '@/types/pagination';
 import type { PostCardData } from '@/types/post-card';
+import PostRenderer from '@/components/blog/PostRenderer';
+import { useAuth } from '@/hooks/useAuth';
 
 const POSTS_PER_PAGE = 12;
 
@@ -39,14 +41,45 @@ function LoadingPostList() {
 
 function BlogContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
+  const slug = searchParams.get('slug');
   
   const [posts, setPosts] = useState<PostCardData[]>([]);
   const [pagination, setPagination] = useState<PaginationInfo | null>(null);
+  const [post, setPost] = useState<PostDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Load individual post if slug is present
   useEffect(() => {
+    if (!slug) {
+      setPost(null);
+      return;
+    }
+
+    const loadPost = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const postData = await fetchPostBySlug(slug);
+        setPost(postData);
+      } catch (err) {
+        console.error('Error loading post:', err);
+        setError('Post not found');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPost();
+  }, [slug]);
+
+  // Load post list if no slug
+  useEffect(() => {
+    if (slug) return; // Don't load list if viewing individual post
+
     const loadPosts = async () => {
       setLoading(true);
       setError(null);
@@ -70,7 +103,7 @@ function BlogContent() {
     };
 
     loadPosts();
-  }, [currentPage]);
+  }, [currentPage, slug]);
 
   if (loading) {
     return <LoadingPostList />;
@@ -80,10 +113,34 @@ function BlogContent() {
     return (
       <div className="text-center py-16">
         <p className="text-red-600 mb-4">{error}</p>
+        {slug && (
+          <button
+            onClick={() => router.push('/blog')}
+            className="text-blue-600 hover:text-blue-800 underline"
+          >
+            ← Back to blog list
+          </button>
+        )}
       </div>
     );
   }
 
+  // Show individual post if slug is present
+  if (slug && post) {
+    return (
+      <div>
+        <button
+          onClick={() => router.push('/blog')}
+          className="mb-6 text-blue-600 hover:text-blue-800 flex items-center gap-2"
+        >
+          ← Back to blog
+        </button>
+        <PostRenderer post={post.post} content={post.content} />
+      </div>
+    );
+  }
+
+  // Show post list
   if (posts.length === 0) {
     return <EmptyPostList />;
   }
@@ -97,6 +154,29 @@ function BlogContent() {
 }
 
 export default function BlogPage() {
+  const { isAuthenticated, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push('/login?redirect=/blog');
+    }
+  }, [isAuthenticated, isLoading, router]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null; // Will redirect in useEffect
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

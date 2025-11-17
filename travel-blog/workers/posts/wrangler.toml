@@ -8,6 +8,7 @@ compatibility_flags = ["nodejs_compat"]
 binding = "DB"
 database_name = "travel-blog-users"
 database_id = "13a81283-7ad4-4879-8287-c435eac578e4"
+migrations_dir = "../migrations"
 
 # R2 Bucket for media
 [[r2_buckets]]

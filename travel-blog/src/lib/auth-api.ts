@@ -52,16 +52,20 @@ export interface LogoutResponse {
  * In development, use Next.js API routes as proxy
  */
 function getAuthApiUrl(): string {
-  // Check if running in production (static export on Pages)
+  // Check if running in browser
   if (typeof window !== 'undefined') {
-    // Production: use environment variable for Worker URL
+    // If on production Pages domain, use Worker URL directly
+    if (window.location.hostname.includes('pages.dev')) {
+      return 'https://travel-blog-auth.andreas-e-ludviksen.workers.dev';
+    }
+    // Otherwise, check environment variable
     const authUrl = process.env.NEXT_PUBLIC_AUTH_API_URL;
     if (authUrl) {
       return authUrl;
     }
   }
   
-  // Development: use Next.js API routes (same origin)
+  // Development/SSR: use Next.js API routes (same origin)
   return '';
 }
 

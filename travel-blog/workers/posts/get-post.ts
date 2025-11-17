@@ -77,10 +77,10 @@ export const getPost = withOptionalAuth(async (request: Request, user, env: Env,
     const post = await db.queryOne(
       `SELECT 
         p.id, p.slug, p.title, p.description, p.cover_image,
-        p.template_id, t.name as template_name,
+        p.design_template_id as template_id, t.name as template_name,
         p.author_id, p.status, p.published_at, p.created_at, p.updated_at
       FROM blog_posts p
-      JOIN design_templates t ON p.template_id = t.id
+      JOIN design_templates t ON p.design_template_id = t.id
       WHERE p.id = ?`,
       [postId]
     );

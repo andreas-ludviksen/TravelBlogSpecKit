@@ -34,6 +34,22 @@ export default function CreatePostPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
+  // Helper function to get API URL based on environment
+  const getPostsApiUrl = (): string => {
+    if (typeof window !== 'undefined' && window.location.hostname.includes('pages.dev')) {
+      return 'https://travel-blog-posts.andreas-e-ludviksen.workers.dev';
+    }
+    return process.env.NEXT_PUBLIC_POSTS_API_URL || 'http://localhost:8788';
+  };
+  
+  // Helper function to get media API URL based on environment
+  const getMediaApiUrl = (): string => {
+    if (typeof window !== 'undefined' && window.location.hostname.includes('pages.dev')) {
+      return 'https://travel-blog-media.andreas-e-ludviksen.workers.dev';
+    }
+    return process.env.NEXT_PUBLIC_MEDIA_API_URL || 'http://localhost:8789';
+  };
+  
   // Helper function to get session token from localStorage or cookie
   const getSessionToken = (): string | null => {
     if (typeof window === 'undefined') return null;
@@ -104,8 +120,7 @@ export default function CreatePostPage() {
         throw new Error('Please log in to create posts');
       }
       
-      const postsApiUrl = process.env.NEXT_PUBLIC_POSTS_API_URL || '';
-      const response = await fetch(`${postsApiUrl}/api/posts/create`, {
+      const response = await fetch(`${getPostsApiUrl()}/api/posts/create`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -158,8 +173,7 @@ export default function CreatePostPage() {
         formData.append('altText', file.name.replace(/\.[^/.]+$/, '')); // Remove extension
         formData.append('displayOrder', photos.length.toString());
 
-        const mediaApiUrl = process.env.NEXT_PUBLIC_MEDIA_API_URL || '';
-        const response = await fetch(`${mediaApiUrl}/api/media/upload-photo`, {
+        const response = await fetch(`${getMediaApiUrl()}/api/media/upload-photo`, {
           method: 'POST',
           credentials: 'include',
           headers: {
@@ -224,8 +238,7 @@ export default function CreatePostPage() {
         formData.append('postId', postId);
         formData.append('displayOrder', videos.length.toString());
 
-        const mediaApiUrl = process.env.NEXT_PUBLIC_MEDIA_API_URL || '';
-        const response = await fetch(`${mediaApiUrl}/api/media/upload-video`, {
+        const response = await fetch(`${getMediaApiUrl()}/api/media/upload-video`, {
           method: 'POST',
           credentials: 'include',
           headers: {
@@ -263,9 +276,17 @@ export default function CreatePostPage() {
 
   const handlePhotoUpdate = async (photoId: string, updates: { caption?: string; altText?: string }) => {
     try {
-      const response = await fetch(`/api/posts/${postId}/photos/${photoId}`, {
+      const token = getSessionToken();
+      if (!token) {
+        throw new Error('Please log in to update photos');
+      }
+
+      const response = await fetch(`${getPostsApiUrl()}/api/posts/${postId}/photos/${photoId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify(updates),
       });
 
@@ -280,8 +301,16 @@ export default function CreatePostPage() {
 
   const handlePhotoDelete = async (photoId: string) => {
     try {
-      const response = await fetch(`/api/posts/${postId}/photos/${photoId}`, {
+      const token = getSessionToken();
+      if (!token) {
+        throw new Error('Please log in to delete photos');
+      }
+
+      const response = await fetch(`${getPostsApiUrl()}/api/posts/${postId}/photos/${photoId}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
       });
 
       if (!response.ok) throw new Error('Failed to delete photo');
@@ -302,21 +331,43 @@ export default function CreatePostPage() {
     });
 
     try {
-      await fetch(`/api/posts/${postId}/reorder`, {
+      const token = getSessionToken();
+      if (!token) {
+        throw new Error('Please log in to reorder content');
+      }
+      
+      const response = await fetch(`${getPostsApiUrl()}/api/posts/${postId}/reorder`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify({ contentType: 'photo', contentIds: photoIds }),
       });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: `HTTP ${response.status}` }));
+        throw new Error(errorData.message || `Failed to reorder photos: ${response.status}`);
+      }
     } catch (err) {
       console.error('Failed to reorder photos:', err);
+      setError(err instanceof Error ? err.message : 'Failed to reorder photos');
     }
   };
 
   const handleVideoUpdate = async (videoId: string, updates: { caption?: string; thumbnailUrl?: string }) => {
     try {
-      const response = await fetch(`/api/posts/${postId}/videos/${videoId}`, {
+      const token = getSessionToken();
+      if (!token) {
+        throw new Error('Please log in to update videos');
+      }
+
+      const response = await fetch(`${getPostsApiUrl()}/api/posts/${postId}/videos/${videoId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify(updates),
       });
 
@@ -330,8 +381,16 @@ export default function CreatePostPage() {
 
   const handleVideoDelete = async (videoId: string) => {
     try {
-      const response = await fetch(`/api/posts/${postId}/videos/${videoId}`, {
+      const token = getSessionToken();
+      if (!token) {
+        throw new Error('Please log in to delete videos');
+      }
+
+      const response = await fetch(`${getPostsApiUrl()}/api/posts/${postId}/videos/${videoId}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
       });
 
       if (!response.ok) throw new Error('Failed to delete video');
@@ -352,13 +411,22 @@ export default function CreatePostPage() {
     });
 
     try {
-      await fetch(`/api/posts/${postId}/reorder`, {
+      const token = getSessionToken();
+      if (!token) {
+        throw new Error('Please log in to reorder content');
+      }
+      
+      await fetch(`${getPostsApiUrl()}/api/posts/${postId}/reorder`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify({ contentType: 'video', contentIds: videoIds }),
       });
     } catch (err) {
       console.error('Failed to reorder videos:', err);
+      setError(err instanceof Error ? err.message : 'Failed to reorder videos');
     }
   };
 
@@ -366,14 +434,35 @@ export default function CreatePostPage() {
     if (!postId) return;
 
     try {
-      // Note: This endpoint doesn't exist yet in the API
-      // We would need to add POST /api/posts/:postId/text
-      const newBlock: TextBlock = {
-        id: Math.random().toString(36),
-        content,
-        displayOrder: textBlocks.length,
-      };
-      setTextBlocks(prev => [...prev, newBlock]);
+      const token = getSessionToken();
+      if (!token) {
+        throw new Error('Please log in to add text blocks');
+      }
+
+      const response = await fetch(`${getPostsApiUrl()}/api/posts/${postId}/text`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ 
+          content,
+          displayOrder: textBlocks.length 
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || 'Failed to add text block');
+      }
+
+      const data = await response.json();
+      
+      setTextBlocks(prev => [...prev, {
+        id: data.textId,
+        content: data.content,
+        displayOrder: data.displayOrder,
+      }]);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add text block');
     }
@@ -381,9 +470,17 @@ export default function CreatePostPage() {
 
   const handleTextUpdate = async (textId: string, content: string) => {
     try {
-      const response = await fetch(`/api/posts/${postId}/text/${textId}`, {
+      const token = getSessionToken();
+      if (!token) {
+        throw new Error('Please log in to update text blocks');
+      }
+
+      const response = await fetch(`${getPostsApiUrl()}/api/posts/${postId}/text/${textId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify({ content }),
       });
 
@@ -397,7 +494,7 @@ export default function CreatePostPage() {
 
   const handleTextDelete = async (textId: string) => {
     try {
-      const response = await fetch(`/api/posts/${postId}/text/${textId}`, {
+      const response = await fetch(`${getPostsApiUrl()}/api/posts/${postId}/text/${textId}`, {
         method: 'DELETE',
       });
 
@@ -419,13 +516,22 @@ export default function CreatePostPage() {
     });
 
     try {
-      await fetch(`/api/posts/${postId}/reorder`, {
+      const token = getSessionToken();
+      if (!token) {
+        throw new Error('Please log in to reorder content');
+      }
+      
+      await fetch(`${getPostsApiUrl()}/api/posts/${postId}/reorder`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify({ contentType: 'text', contentIds: textIds }),
       });
     } catch (err) {
       console.error('Failed to reorder text blocks:', err);
+      setError(err instanceof Error ? err.message : 'Failed to reorder text blocks');
     }
   };
 
@@ -439,8 +545,7 @@ export default function CreatePostPage() {
         throw new Error('Please log in to publish posts');
       }
 
-      const postsApiUrl = process.env.NEXT_PUBLIC_POSTS_API_URL || '';
-      const response = await fetch(`${postsApiUrl}/api/posts/${postId}`, {
+      const response = await fetch(`${getPostsApiUrl()}/api/posts/${postId}`, {
         method: 'PATCH',
         headers: { 
           'Content-Type': 'application/json',

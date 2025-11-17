@@ -5,6 +5,13 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // Skip build-time validation for dynamic routes (will be client-side rendered)
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+  eslint: {
+    ignoreDuringBuilds: false,
+  },
 };
 
 export default nextConfig;

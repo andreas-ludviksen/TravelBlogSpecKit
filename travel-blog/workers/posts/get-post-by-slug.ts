@@ -20,9 +20,15 @@ interface Env {
   JWT_SECRET: string;
 }
 
-export const getPostBySlug = withOptionalAuth(async (request: Request, user, env: Env, params: any) => {
+export const getPostBySlug = withOptionalAuth(async (request: Request & { params?: any }, user, env: Env, params: any) => {
   try {
-    const { slug } = params;
+    // itty-router puts params on the request object
+    const routeParams = (request as any).params || params;
+    const { slug } = routeParams;
+
+    console.log('[getPostBySlug] slug from params:', slug);
+    console.log('[getPostBySlug] request.params:', (request as any).params);
+    console.log('[getPostBySlug] params arg:', params);
 
     if (!slug) {
       throw new NotFoundError('Post not found');
@@ -34,10 +40,10 @@ export const getPostBySlug = withOptionalAuth(async (request: Request, user, env
     const post = await db.queryOne(
       `SELECT 
         p.id, p.slug, p.title, p.description, p.cover_image,
-        p.template_id, t.name as template_name,
+        p.design_template_id as template_id, t.name as template_name,
         p.author_id, p.status, p.published_at, p.created_at, p.updated_at
       FROM blog_posts p
-      JOIN design_templates t ON p.template_id = t.id
+      JOIN design_templates t ON p.design_template_id = t.id
       WHERE p.slug = ?`,
       [slug]
     );
@@ -67,7 +73,7 @@ export const getPostBySlug = withOptionalAuth(async (request: Request, user, env
     // Get videos
     const videos = await db.query(
       `SELECT 
-        id, url, r2_object_key, caption, display_order,
+        id, url, r2_key, caption, display_order,
         thumbnail_url, duration_seconds
       FROM video_content
       WHERE post_id = ?
@@ -114,7 +120,7 @@ export const getPostBySlug = withOptionalAuth(async (request: Request, user, env
         videos: videos.map((v: any) => ({
           id: v.id,
           url: v.url,
-          r2ObjectKey: v.r2_object_key,
+          r2ObjectKey: v.r2_key,
           caption: v.caption,
           displayOrder: v.display_order,
           thumbnailUrl: v.thumbnail_url,

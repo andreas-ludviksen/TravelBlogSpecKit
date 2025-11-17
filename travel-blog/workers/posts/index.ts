@@ -29,6 +29,7 @@ import { updatePhoto } from './update-photo';
 import { deletePhoto } from './delete-photo';
 import { updateVideo } from './update-video';
 import { deleteVideo } from './delete-video';
+import { createText } from './create-text';
 import { updateText } from './update-text';
 import { deleteText } from './delete-text';
 import { reorderContent } from './reorder';
@@ -81,6 +82,7 @@ router.put('/api/posts/:postId/videos/:videoId', updateVideo);
 router.delete('/api/posts/:postId/videos/:videoId', deleteVideo);
 
 // Text content management
+router.post('/api/posts/:postId/text', createText);
 router.put('/api/posts/:postId/text/:textId', updateText);
 router.delete('/api/posts/:postId/text/:textId', deleteText);
 

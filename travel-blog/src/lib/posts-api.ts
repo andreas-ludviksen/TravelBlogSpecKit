@@ -7,7 +7,14 @@
 
 import type { PostListData } from '@/types/post-card';
 
-const POSTS_API_URL = process.env.NEXT_PUBLIC_POSTS_API_URL || 'http://localhost:8788';
+function getPostsApiUrl(): string {
+  if (typeof window !== 'undefined' && window.location.hostname.includes('pages.dev')) {
+    return 'https://travel-blog-posts.andreas-e-ludviksen.workers.dev';
+  }
+  return process.env.NEXT_PUBLIC_POSTS_API_URL || 'http://localhost:8788';
+}
+
+const POSTS_API_URL = getPostsApiUrl();
 
 // API response types matching worker responses
 export interface PostDetailResponse {
@@ -80,11 +87,12 @@ export async function fetchPublishedPosts(
 
     const data = await response.json();
     
-    if (!data.success) {
-      throw new Error(data.error || 'Failed to fetch posts');
+    // Check if response has error field (error responses)
+    if (data.error) {
+      throw new Error(data.message || 'Failed to fetch posts');
     }
 
-    return data.data;
+    return data;
   } catch (error) {
     console.error('Error fetching published posts:', error);
     throw error;
@@ -115,11 +123,12 @@ export async function fetchPostById(postId: string): Promise<PostDetailResponse>
 
     const data = await response.json();
     
-    if (!data.success) {
-      throw new Error(data.error || 'Failed to fetch post');
+    // Check if response has error field (error responses)
+    if (data.error) {
+      throw new Error(data.message || 'Failed to fetch post');
     }
 
-    return data.data;
+    return data;
   } catch (error) {
     console.error('Error fetching post:', error);
     throw error;
@@ -150,11 +159,12 @@ export async function fetchPostBySlug(slug: string): Promise<PostDetailResponse>
 
     const data = await response.json();
     
-    if (!data.success) {
-      throw new Error(data.error || 'Failed to fetch post');
+    // Check if response has error field (error responses)
+    if (data.error) {
+      throw new Error(data.message || 'Failed to fetch post');
     }
 
-    return data.data;
+    return data;
   } catch (error) {
     console.error('Error fetching post by slug:', error);
     throw error;

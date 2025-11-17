@@ -1,20 +1,40 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
-import { highlightPhotos } from '@/data/highlights';
-import HighlightPhotoCard from '@/components/HighlightPhotoCard';
+import { fetchPublishedPosts } from '@/lib/posts-api';
+import type { PostCardData } from '@/types/post-card';
+import PostCard from '@/components/blog/PostCard';
 
 export default function Home() {
   const router = useRouter();
   const { isAuthenticated, isLoading } = useAuth();
+  const [posts, setPosts] = useState<PostCardData[]>([]);
+  const [loadingPosts, setLoadingPosts] = useState(true);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       router.push('/login');
     }
   }, [isLoading, isAuthenticated, router]);
+
+  useEffect(() => {
+    const loadPosts = async () => {
+      try {
+        const result = await fetchPublishedPosts(6, 0); // Get 6 latest posts
+        setPosts(result.posts);
+      } catch (error) {
+        console.error('Error loading posts:', error);
+      } finally {
+        setLoadingPosts(false);
+      }
+    };
+
+    if (isAuthenticated) {
+      loadPosts();
+    }
+  }, [isAuthenticated]);
 
   // Show loading state while checking auth
   if (isLoading) {
@@ -55,15 +75,29 @@ export default function Home() {
             Featured Highlights
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Our most memorable moments captured in stunning photography
+            Latest posts from our family adventures
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          {highlightPhotos.map((photo) => (
-            <HighlightPhotoCard key={photo.id} photo={photo} />
-          ))}
-        </div>
+        {loadingPosts ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
+                <div className="h-48 bg-gray-200" />
+                <div className="p-6">
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
+                  <div className="h-4 bg-gray-200 rounded w-1/2" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            {posts.map((post, index) => (
+              <PostCard key={post.id} post={post} priority={index < 3} />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Call to Action */}
@@ -73,20 +107,20 @@ export default function Home() {
             Ready to Explore More?
           </h2>
           <p className="text-lg text-gray-600 mb-8">
-            Discover detailed travel stories and practical family travel tips
+            Discover detailed travel stories and family adventures
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="/travels"
+              href="/blog"
               className="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
             >
-              View Travel Stories
+              View All Posts
             </a>
             <a
-              href="/family-tips"
+              href="/posts/create"
               className="inline-block bg-gray-200 text-gray-800 px-8 py-3 rounded-lg font-medium hover:bg-gray-300 transition-colors"
             >
-              Get Family Tips
+              Create New Post
             </a>
           </div>
         </div>

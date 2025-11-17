@@ -19,6 +19,7 @@ interface Env {
   DB: D1Database;
   MEDIA_BUCKET: R2Bucket;
   CLOUDFLARE_ACCOUNT_ID: string;
+  CLOUDFLARE_IMAGES_ACCOUNT_HASH: string;
   CLOUDFLARE_IMAGES_API_TOKEN: string;
   JWT_SECRET: string;
 }

@@ -10,16 +10,9 @@ export const navigationItems: NavigationItem[] = [
   },
   {
     id: 'nav-2',
-    label: 'Travels',
-    href: '/travels',
+    label: 'Blog',
+    href: '/blog',
     order: 2,
-    isActive: true,
-  },
-  {
-    id: 'nav-3',
-    label: 'Family Tips',
-    href: '/family-tips',
-    order: 3,
     isActive: true,
   },
 ];

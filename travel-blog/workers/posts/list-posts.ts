@@ -112,13 +112,17 @@ export const listPosts = withOptionalAuth(async (request: Request, user, env: En
     // Get posts with content counts
     const posts = await db.query(
       `SELECT 
-        p.id, p.slug, p.title, p.description, p.cover_image,
-        p.template_id, t.name as template_name,
+        p.id, p.slug, p.title, p.description, 
+        COALESCE(
+          p.cover_image,
+          (SELECT url FROM photo_content WHERE post_id = p.id ORDER BY display_order ASC LIMIT 1)
+        ) as cover_image,
+        p.design_template_id as template_id, t.name as template_name,
         p.author_id, p.status, p.published_at, p.created_at, p.updated_at,
         (SELECT COUNT(*) FROM photo_content WHERE post_id = p.id) as photo_count,
         (SELECT COUNT(*) FROM video_content WHERE post_id = p.id) as video_count
       FROM blog_posts p
-      JOIN design_templates t ON p.template_id = t.id
+      JOIN design_templates t ON p.design_template_id = t.id
       ${whereClause}
       ORDER BY p.created_at DESC
       LIMIT ? OFFSET ?`,

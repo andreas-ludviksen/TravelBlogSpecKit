@@ -6,7 +6,8 @@
  */
 
 export interface CloudflareImagesConfig {
-  accountId: string;
+  accountId: string;        // For API calls
+  accountHash: string;      // For delivery URLs (imagedelivery.net)
   apiToken: string;
 }
 
@@ -15,14 +16,12 @@ export interface ImageUploadResult {
   filename: string;
   uploaded: string;
   requireSignedURLs: boolean;
-  variants: string[];
+  variants: string[];  // Full URLs to image variants
 }
 
 export interface ImageVariantUrls {
-  thumbnail: string;  // 200x200
-  mobile: string;     // 800x600
-  desktop: string;    // 1920x1080
-  original: string;   // Full resolution
+  public: string;      // Default public variant
+  [key: string]: string;  // Other custom variants
 }
 
 export class CloudflareImagesClient {
@@ -107,19 +106,39 @@ export class CloudflareImagesClient {
   }
 
   /**
-   * Get image variant URLs
+   * Get image variant URLs from upload result
+   * The API returns full URLs for all configured variants
    */
-  getVariantUrls(imageId: string, accountHash?: string): ImageVariantUrls {
-    // Account hash is in the image delivery URL format
-    // https://imagedelivery.net/<account-hash>/<image-id>/<variant>
-    const hash = accountHash || this.config.accountId;
-    const baseDeliveryUrl = `https://imagedelivery.net/${hash}/${imageId}`;
+  getVariantUrlsFromResult(uploadResult: ImageUploadResult): ImageVariantUrls {
+    // uploadResult.variants is an array of full URLs
+    // e.g., ["https://imagedelivery.net/hash/id/public", ...]
+    const urls: ImageVariantUrls = { public: '' };
+    
+    for (const variantUrl of uploadResult.variants) {
+      // Extract variant name from URL (last segment)
+      const parts = variantUrl.split('/');
+      const variantName = parts[parts.length - 1];
+      urls[variantName] = variantUrl;
+    }
+    
+    // Ensure public variant exists
+    if (!urls.public && uploadResult.variants.length > 0) {
+      urls.public = uploadResult.variants[0];
+    }
+    
+    return urls;
+  }
+
+  /**
+   * Get image variant URLs (legacy method - constructs URLs)
+   * Uses the account hash for delivery URLs
+   */
+  getVariantUrls(imageId: string): ImageVariantUrls {
+    // Use the delivery account hash, not the API account ID
+    const baseDeliveryUrl = `https://imagedelivery.net/${this.config.accountHash}/${imageId}`;
 
     return {
-      thumbnail: `${baseDeliveryUrl}/thumbnail`,
-      mobile: `${baseDeliveryUrl}/mobile`,
-      desktop: `${baseDeliveryUrl}/desktop`,
-      original: `${baseDeliveryUrl}/public`,
+      public: `${baseDeliveryUrl}/public`,
     };
   }
 
