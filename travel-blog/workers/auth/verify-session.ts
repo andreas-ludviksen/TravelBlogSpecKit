@@ -15,25 +15,29 @@ import type { Env, ErrorResponse, VerifySessionResponse } from '../types';
  */
 export async function handleVerify(request: Request, env: Env): Promise<Response> {
   try {
-    // Extract token from cookie
-    const cookieHeader = request.headers.get('Cookie');
-
-    if (!cookieHeader) {
-      console.warn('[VERIFY] No cookie header present');
-      return jsonResponse<ErrorResponse>(
-        {
-          success: false,
-          error: 'NO_SESSION',
-          message: 'No session found',
-        },
-        401
-      );
+    // Extract token from cookie OR Authorization header (for cross-domain/mobile)
+    let token: string | null = null;
+    
+    // First, try Authorization header (for cross-domain scenarios like mobile Safari)
+    const authHeader = request.headers.get('Authorization');
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
+      console.log('[VERIFY] Token extracted from Authorization header');
+    }
+    
+    // Fallback to cookie
+    if (!token) {
+      const cookieHeader = request.headers.get('Cookie');
+      if (cookieHeader) {
+        token = extractTokenFromCookie(cookieHeader);
+        if (token) {
+          console.log('[VERIFY] Token extracted from cookie');
+        }
+      }
     }
 
-    const token = extractTokenFromCookie(cookieHeader);
-
     if (!token) {
-      console.warn('[VERIFY] No session token found in cookie');
+      console.warn('[VERIFY] No token found in Authorization header or cookie');
       return jsonResponse<ErrorResponse>(
         {
           success: false,

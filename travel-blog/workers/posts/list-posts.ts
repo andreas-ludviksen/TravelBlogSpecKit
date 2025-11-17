@@ -55,14 +55,14 @@ interface ListPostsResponse {
 export const listPosts = withOptionalAuth(async (request: Request, user, env: Env) => {
   try {
     const url = new URL(request.url);
-    const status = url.searchParams.get('status') as 'draft' | 'published' | null;
+    const status = url.searchParams.get('status') as 'draft' | 'published' | 'all' | null;
     const authorId = url.searchParams.get('authorId');
     const limit = Math.min(parseInt(url.searchParams.get('limit') || '20', 10), 100);
     const offset = parseInt(url.searchParams.get('offset') || '0', 10);
 
     // Validate parameters
-    if (status && !['draft', 'published'].includes(status)) {
-      throw new ValidationError('status must be either "draft" or "published"');
+    if (status && !['draft', 'published', 'all'].includes(status)) {
+      throw new ValidationError('status must be either "draft", "published", or "all"');
     }
     if (limit < 1 || limit > 100) {
       throw new ValidationError('limit must be between 1 and 100');
@@ -82,6 +82,10 @@ export const listPosts = withOptionalAuth(async (request: Request, user, env: En
     if (!user) {
       conditions.push('p.status = ?');
       params.push('published');
+    } else if (status === 'all') {
+      // Show all posts for authenticated user (their own posts only)
+      conditions.push('p.author_id = ?');
+      params.push(user.sub);
     } else if (status) {
       conditions.push('p.status = ?');
       params.push(status);
@@ -120,7 +124,8 @@ export const listPosts = withOptionalAuth(async (request: Request, user, env: En
         p.design_template_id as template_id, t.name as template_name,
         p.author_id, p.status, p.published_at, p.created_at, p.updated_at,
         (SELECT COUNT(*) FROM photo_content WHERE post_id = p.id) as photo_count,
-        (SELECT COUNT(*) FROM video_content WHERE post_id = p.id) as video_count
+        (SELECT COUNT(*) FROM video_content WHERE post_id = p.id) as video_count,
+        (SELECT COUNT(*) FROM text_content WHERE post_id = p.id) as text_count
       FROM blog_posts p
       JOIN design_templates t ON p.design_template_id = t.id
       ${whereClause}
@@ -146,6 +151,7 @@ export const listPosts = withOptionalAuth(async (request: Request, user, env: En
         updatedAt: p.updated_at,
         photoCount: p.photo_count,
         videoCount: p.video_count,
+        textCount: p.text_count,
       })),
       pagination: {
         total,

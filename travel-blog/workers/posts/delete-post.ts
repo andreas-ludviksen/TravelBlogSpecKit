@@ -8,6 +8,7 @@
 
 import { createDatabaseClient } from '../lib/db';
 import { createR2Client } from '../lib/cloudflare-r2';
+import { createCloudflareImagesClient } from '../lib/cloudflare-images';
 import { withAuth } from '../lib/auth-middleware';
 import type { SessionPayload } from '../lib/jwt';
 import { 
@@ -25,9 +26,11 @@ interface Env {
   JWT_SECRET: string;
 }
 
-export const deletePost = withAuth(async (request: Request, user, env: Env, params: any) => {
+export const deletePost = withAuth(async (request: Request & { params?: any }, user, env: Env, params: any) => {
   try {
-    const { postId } = params;
+    // Extract params from request object (itty-router)
+    const routeParams = (request as any).params || params;
+    const { postId } = routeParams;
 
     if (!postId) {
       throw new NotFoundError('Post not found');
@@ -52,15 +55,19 @@ export const deletePost = withAuth(async (request: Request, user, env: Env, para
 
     // Get video content to delete from R2
     const videos = await db.query(
-      'SELECT r2_object_key FROM video_content WHERE post_id = ?',
+      'SELECT r2_key FROM video_content WHERE post_id = ?',
       [postId]
     );
 
     // Get photo content to delete from Cloudflare Images
-    // Note: We're NOT deleting from Cloudflare Images here because they may be reused
-    // In a production system, you'd want to track usage and delete unused images
+    const photos = await db.query(
+      'SELECT cloudflare_image_id FROM photo_content WHERE post_id = ?',
+      [postId]
+    );
 
-    // Delete all content (cascade through foreign keys)
+    console.log(`[DELETE POST] Deleting post ${postId} with ${photos.length} photos and ${videos.length} videos`);
+
+    // Delete all content from database (cascade through foreign keys)
     await db.batch([
       { query: 'DELETE FROM photo_content WHERE post_id = ?', params: [postId] },
       { query: 'DELETE FROM video_content WHERE post_id = ?', params: [postId] },
@@ -69,23 +76,64 @@ export const deletePost = withAuth(async (request: Request, user, env: Env, para
       { query: 'DELETE FROM blog_posts WHERE id = ?', params: [postId] },
     ]);
 
+    // Delete photos from Cloudflare Images (best effort)
+    if (photos.length > 0) {
+      const imagesClient = createCloudflareImagesClient({
+        accountId: env.CLOUDFLARE_ACCOUNT_ID,
+        accountHash: 'QxBDcO6nSQt1EuhABg3fCg', // Hardcoded delivery hash
+        apiToken: env.CLOUDFLARE_IMAGES_API_TOKEN,
+      });
+
+      let deletedPhotos = 0;
+      let failedPhotos = 0;
+
+      for (const photo of photos) {
+        try {
+          const success = await imagesClient.delete(photo.cloudflare_image_id);
+          if (success) {
+            deletedPhotos++;
+            console.log(`[DELETE POST] Deleted image: ${photo.cloudflare_image_id}`);
+          } else {
+            failedPhotos++;
+            console.warn(`[DELETE POST] Failed to delete image: ${photo.cloudflare_image_id}`);
+          }
+        } catch (error) {
+          failedPhotos++;
+          console.error(`[DELETE POST] Error deleting image ${photo.cloudflare_image_id}:`, error);
+          // Continue deleting other photos even if one fails
+        }
+      }
+
+      console.log(`[DELETE POST] Photos deleted: ${deletedPhotos}, failed: ${failedPhotos}`);
+    }
+
     // Delete videos from R2 (best effort)
     if (videos.length > 0) {
       const r2Client = createR2Client(env.MEDIA_BUCKET);
+      let deletedVideos = 0;
+      let failedVideos = 0;
+
       for (const video of videos) {
         try {
-          await r2Client.delete(video.r2_object_key);
+          await r2Client.delete(video.r2_key);
+          deletedVideos++;
+          console.log(`[DELETE POST] Deleted video: ${video.r2_key}`);
         } catch (error) {
-          console.error(`Failed to delete video from R2: ${video.r2_object_key}`, error);
+          failedVideos++;
+          console.error(`[DELETE POST] Error deleting video ${video.r2_key}:`, error);
           // Continue deleting other videos even if one fails
         }
       }
+
+      console.log(`[DELETE POST] Videos deleted: ${deletedVideos}, failed: ${failedVideos}`);
     }
 
     // Return response
     return successResponse({
       message: 'Post deleted successfully',
       postId,
+      deletedPhotos: photos.length,
+      deletedVideos: videos.length,
     });
 
   } catch (error) {

@@ -110,9 +110,24 @@ export async function login(credentials: LoginRequest): Promise<LoginResponse> {
  */
 export async function verifySession(): Promise<VerifyResponse | ErrorResponse> {
   try {
+    // Prepare headers
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    // Add Authorization header if token exists in localStorage (for mobile/cross-domain)
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('session_token');
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+        console.log('[Auth] Sending token via Authorization header');
+      }
+    }
+    
     const response = await fetch(`${getAuthApiUrl()}/api/auth/verify`, {
       method: 'GET',
-      credentials: 'include', // Include cookies in request
+      credentials: 'include', // Include cookies in request (for desktop browsers)
+      headers,
     });
 
     const data = await response.json();
