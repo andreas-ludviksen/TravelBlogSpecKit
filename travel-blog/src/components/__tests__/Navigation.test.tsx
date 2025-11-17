@@ -25,22 +25,21 @@ describe('Navigation Component', () => {
     
     render(<Navigation />);
     
-    // Check for all expected navigation links
-    expect(screen.getByRole('link', { name: /home/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /travels/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /family tips/i })).toBeInTheDocument();
+    // Check for all expected navigation links (using exact match to avoid matching "Travel Blog")
+    expect(screen.getByRole('link', { name: /^home$/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /^blog$/i })).toBeInTheDocument();
   });
 
   it('highlights the active link based on pathname', () => {
-    (usePathname as jest.Mock).mockReturnValue('/travels');
+    (usePathname as jest.Mock).mockReturnValue('/blog');
     
     render(<Navigation />);
     
-    const travelsLink = screen.getByRole('link', { name: /travels/i });
-    const homeLink = screen.getByRole('link', { name: /home/i });
+    const blogLink = screen.getByRole('link', { name: /^blog$/i });
+    const homeLink = screen.getByRole('link', { name: /^home$/i });
     
     // Active link should have bg-blue-600 text-white classes
-    expect(travelsLink).toHaveClass('bg-blue-600', 'text-white');
+    expect(blogLink).toHaveClass('bg-blue-600', 'text-white');
     // Inactive links should NOT have those classes
     expect(homeLink).not.toHaveClass('bg-blue-600');
     expect(homeLink).not.toHaveClass('text-white');
@@ -63,7 +62,6 @@ describe('Navigation Component', () => {
     render(<Navigation />);
     
     expect(screen.getByRole('link', { name: /^home$/i })).toHaveAttribute('href', '/');
-    expect(screen.getByRole('link', { name: /travels/i })).toHaveAttribute('href', '/travels');
-    expect(screen.getByRole('link', { name: /family tips/i })).toHaveAttribute('href', '/family-tips');
+    expect(screen.getByRole('link', { name: /^blog$/i })).toHaveAttribute('href', '/blog');
   });
 });
