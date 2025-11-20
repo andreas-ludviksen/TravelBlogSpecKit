@@ -15,7 +15,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'Travel Blog - Family Adventures Around the World',
+  title: 'Travel Bloggg - Family Adventures Around the World',
   description:
     'Explore our family travel stories, stunning photography highlights, and practical tips for traveling with kids.',
 };
