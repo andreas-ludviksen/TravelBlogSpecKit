@@ -59,5 +59,62 @@ Testing: Use React Testing Library queries (getByRole, getByText), avoid test ID
 
 - 001-travel-blog-website: Added TypeScript 5.x with Next.js 14.x (App Router with static export) + Next.js (static export), React 18, TailwindCSS for styling, next/image for optimized images
 
+## Pull Request Review Guidelines
+
+When analyzing pull requests and generating PR summaries, follow these instructions:
+
+### PR Summary Format
+
+Generate a comprehensive PR summary with the following sections:
+
+#### 1. **Overview**
+- Brief description of what this PR accomplishes (1-2 sentences)
+- Related issue/spec numbers if applicable
+
+#### 2. **Changes Made**
+Analyze the git diff and categorize changes:
+- **New Features**: New functionality added
+- **Bug Fixes**: Issues resolved
+- **Refactoring**: Code improvements without functional changes
+- **Tests**: New or updated tests
+- **Documentation**: README, docs, or code comments
+- **Configuration**: Config files, dependencies, or build setup
+- **Breaking Changes**: Any backward-incompatible changes (⚠️ highlight these)
+
+#### 3. **Impact Analysis**
+- **Scope**: Which parts of the application are affected?
+- **Risk Level**: Low/Medium/High based on:
+  - Complexity of changes
+  - Number of files touched
+  - Presence of tests
+  - Breaking changes
+- **Testing Coverage**: Are the changes adequately tested?
+
+#### 4. **Review Checklist**
+Generate a checklist based on the changes:
+- [ ] Code follows project style guidelines
+- [ ] Tests are included and passing
+- [ ] No security vulnerabilities introduced
+- [ ] Documentation is updated if needed
+- [ ] Breaking changes are clearly documented
+- [ ] No unnecessary dependencies added
+- [ ] Error handling is appropriate
+- [ ] Performance implications considered
+
+#### 5. **Recommendations**
+- Specific areas to focus review attention on
+- Potential concerns or questions for the author
+- Suggestions for additional tests or documentation
+
+### Output Format
+
+Use clear Markdown with:
+- Headers for each section
+- Bullet points for lists
+- Code blocks for file paths or code snippets
+- Emoji for visual clarity (✅ ⚠️ 🔒 🚀 📝 🧪)
+- Tables for file impact analysis when appropriate
+- Output the result as a markdown code block in the chat so it can be easily copied.
+
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->
