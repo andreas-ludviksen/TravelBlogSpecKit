@@ -12,6 +12,7 @@ import { Router } from 'itty-router';
 import { handleCORSPreflight, addCORSHeaders } from '../lib/cors';
 import { uploadPhoto } from './upload-photo';
 import { uploadVideo } from './upload-video';
+import { getVideo } from './get-video';
 import { validateUrl } from './validate-url';
 import { errorResponse, handleError } from '../lib/errors';
 
@@ -38,6 +39,12 @@ router.post('/api/media/upload-photo', uploadPhoto);
 
 // Upload video to Cloudflare R2
 router.post('/api/media/upload-video', uploadVideo);
+
+// Get video from R2
+router.get('/api/media/video/:videoId/:filename', getVideo);
+
+// Handle HEAD requests for video (Safari requirement)
+router.head('/api/media/video/:videoId/:filename', getVideo);
 
 // Validate external media URL
 router.post('/api/media/validate-url', validateUrl);

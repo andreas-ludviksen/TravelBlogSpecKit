@@ -74,17 +74,20 @@ export const uploadVideo = withAuth(async (request: Request, user, env: Env) => 
       contentType: file.type,
     });
 
-    // Generate public URL
-    const videoUrl = `https://media.yourdomain.com/${objectKey}`;
+    // Generate public URL pointing to our worker endpoint
+    const videoUrl = `https://travel-blog-media.andreas-e-ludviksen.workers.dev/api/media/video/${videoId}/${encodeURIComponent(file.name)}`;
 
     // Store video metadata in database
     const db = createDatabaseClient(env.DB);
     const now = new Date().toISOString();
+    
+    // Convert file size from bytes to MB
+    const fileSizeMB = file.size / (1024 * 1024);
 
     await db.execute(
       `INSERT INTO video_content (
-        id, post_id, url, r2_object_key, caption, display_order, 
-        source, original_filename, uploaded_at, file_size_bytes, mime_type
+        id, post_id, url, r2_key, caption, display_order, 
+        source, original_filename, uploaded_at, file_size_mb, format
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         videoId,
@@ -96,7 +99,7 @@ export const uploadVideo = withAuth(async (request: Request, user, env: Env) => 
         source,
         file.name,
         now,
-        file.size,
+        fileSizeMB,
         file.type,
       ]
     );
@@ -105,9 +108,9 @@ export const uploadVideo = withAuth(async (request: Request, user, env: Env) => 
     return successResponse({
       videoId,
       url: videoUrl,
-      r2ObjectKey: objectKey,
-      fileSizeBytes: file.size,
-      mimeType: file.type,
+      r2Key: objectKey,
+      fileSizeMB: fileSizeMB,
+      format: file.type,
       uploadedAt: now,
     }, 201);
 
