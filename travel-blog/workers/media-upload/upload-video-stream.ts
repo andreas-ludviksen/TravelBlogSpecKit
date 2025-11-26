@@ -127,14 +127,15 @@ export const uploadVideoStream = withAuth(async (request: Request, user, env: En
     
     await env.DB.prepare(
       `INSERT INTO video_content (
-        id, post_id, url, stream_id, caption, display_order, 
+        id, post_id, url, r2_key, stream_id, caption, display_order, 
         source, original_filename, uploaded_at, duration_seconds,
         file_size_mb, format, thumbnail_url, width, height
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     ).bind(
       videoContentId,
       postId,
       streamData.result.playback.hls, // HLS playback URL
+      `stream/${videoId}`, // Placeholder r2_key for Stream videos
       videoId, // Cloudflare Stream ID
       caption || null,
       0, // Default display order
