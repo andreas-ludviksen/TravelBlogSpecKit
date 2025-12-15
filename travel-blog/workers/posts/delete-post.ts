@@ -49,8 +49,11 @@ export const deletePost = withAuth(async (request: Request & { params?: any }, u
       throw new NotFoundError('Post not found');
     }
 
-    // Check if user is the author (or admin in the future)
-    if (post.author_id !== user.sub) {
+    // Check if user is the author or has contributor role (contributors can delete any post)
+    const isAuthor = post.author_id === user.sub;
+    const isContributor = user.role === 'contributor';
+    
+    if (!isAuthor && !isContributor) {
       throw new UnauthorizedError('You do not have permission to delete this post');
     }
 
