@@ -1,6 +1,12 @@
 name: CI - Build and Test
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'travel-blog/**'
+      - '.github/workflows/ci.yml'
   pull_request:
     branches:
       - main
